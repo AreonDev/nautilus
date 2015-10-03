@@ -26,24 +26,8 @@
 #include <glib-object.h>
 
 #define NAUTILUS_TYPE_QUERY		(nautilus_query_get_type ())
-#define NAUTILUS_QUERY(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), NAUTILUS_TYPE_QUERY, NautilusQuery))
-#define NAUTILUS_QUERY_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST ((klass), NAUTILUS_TYPE_QUERY, NautilusQueryClass))
-#define NAUTILUS_IS_QUERY(obj)		(G_TYPE_CHECK_INSTANCE_TYPE ((obj), NAUTILUS_TYPE_QUERY))
-#define NAUTILUS_IS_QUERY_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE ((klass), NAUTILUS_TYPE_QUERY))
-#define NAUTILUS_QUERY_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS ((obj), NAUTILUS_TYPE_QUERY, NautilusQueryClass))
 
-typedef struct NautilusQueryDetails NautilusQueryDetails;
-
-typedef struct NautilusQuery {
-	GObject parent;
-	NautilusQueryDetails *details;
-} NautilusQuery;
-
-typedef struct {
-	GObjectClass parent_class;
-} NautilusQueryClass;
-
-GType          nautilus_query_get_type (void);
+G_DECLARE_FINAL_TYPE (NautilusQuery, nautilus_query, NAUTILUS, QUERY, GObject)
 
 NautilusQuery* nautilus_query_new      (void);
 
