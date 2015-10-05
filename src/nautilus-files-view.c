@@ -3080,9 +3080,24 @@ nautilus_files_view_set_location (NautilusView *view,
                                   GFile        *location)
 {
         NautilusDirectory *directory;
+        NautilusFilesView *files_view;
 
         nautilus_profile_start (NULL);
+        files_view = NAUTILUS_FILES_VIEW (view);
         directory = nautilus_directory_get (location);
+
+        /* If we're entering a search directory, the search query
+         * must be updated to match the current search.
+         */
+        if (NAUTILUS_IS_SEARCH_DIRECTORY (directory)) {
+                NautilusQuery *query;
+
+                query = nautilus_search_directory_get_query (NAUTILUS_SEARCH_DIRECTORY (directory));
+
+                g_set_object (&files_view->details->search_query, query);
+                g_clear_object (&query);
+        }
+
         load_directory (NAUTILUS_FILES_VIEW (view), directory);
         nautilus_directory_unref (directory);
         nautilus_profile_end (NULL);

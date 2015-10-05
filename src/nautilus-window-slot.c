@@ -249,14 +249,13 @@ nautilus_window_slot_content_view_matches (NautilusWindowSlot *slot,
 }
 
 static void
-check_search_visible (NautilusWindowSlot *slot)
+update_search_visible_action (NautilusWindowSlot *slot)
 {
         NautilusQuery *query;
         NautilusView *view;
         gchar *text;
         GAction *action;
 
-        query = nautilus_query_editor_get_query (slot->details->query_editor);
         action =  g_action_map_lookup_action (G_ACTION_MAP (slot->details->slot_action_group),
                                               "search-visible");
         /* Don't allow search on desktop */
@@ -266,8 +265,28 @@ check_search_visible (NautilusWindowSlot *slot)
         view = nautilus_window_slot_get_current_view (slot);
         /* If we changed location just to another search location, for example,
          * when changing the query, just keep the search visible */
-        if (nautilus_view_is_searching (view))
+        if (nautilus_view_is_searching (view)) {
+                GVariant *variant;
+                gboolean search_visible;
+
+                variant = g_action_get_state (action);
+                search_visible = g_variant_get_boolean (variant);
+
+                g_variant_unref (variant);
+
+                /* When we go back or forward to a search location, the search
+                 * state must be restored.
+                 */
+                if (!search_visible) {
+                        nautilus_query_editor_set_query (slot->details->query_editor,
+                                                         nautilus_view_get_search_query (view));
+                        nautilus_window_slot_set_search_visible (slot, TRUE);
+                }
+
                 return;
+        }
+
+        query = nautilus_query_editor_get_query (slot->details->query_editor);
 
         if (query) {
                 text = nautilus_query_get_text (query);
@@ -298,7 +317,7 @@ nautilus_window_slot_sync_actions (NautilusWindowSlot *slot)
         /* Check if we need to close the search or not after changing the location.
          * Needs to be done after the change has been done, if not, a loop happens,
          * because setting the search enabled or not actually opens a location */
-        check_search_visible (slot);
+        update_search_visible_action (slot);
 
         /* Files view mode */
         action =  g_action_map_lookup_action (G_ACTION_MAP (slot->details->slot_action_group), "files-view-mode");
