@@ -118,9 +118,11 @@ model_directory_ready_cb (NautilusDirectory	*directory,
 	gdouble match;
 	gboolean found;
 	NautilusSearchHit *hit;
+        GDateTime *dt;
 
 	files = nautilus_directory_get_file_list (directory);
 	mime_types = nautilus_query_get_mime_types (model->details->query);
+        dt = nautilus_query_get_date (model->details->query);
 	hits = NULL;
 
 	for (l = files; l != NULL; l = l->next) {
@@ -140,6 +142,44 @@ model_directory_ready_cb (NautilusDirectory	*directory,
 				}
 			}
 		}
+
+                if (found && dt != NULL) {
+                        NautilusQuerySearchType type;
+                        guint64 query_time, current_file_time;
+                        const gchar *attrib;
+                        GFileInfo *info;
+                        GError *error;
+                        GFile *location;
+
+                        type = nautilus_query_get_search_type (model->details->query);
+                        location = nautilus_file_get_location (file);
+
+                        if (type == NAUTILUS_QUERY_SEARCH_TYPE_LAST_ACCESS) {
+                                attrib = G_FILE_ATTRIBUTE_TIME_ACCESS;
+                        } else {
+                                attrib = G_FILE_ATTRIBUTE_TIME_MODIFIED;
+                        }
+
+                        query_time = g_date_time_to_unix (dt);
+
+                        /* Query current file's attribute */
+                        info = g_file_query_info (location,
+                                                  attrib,
+                                                  G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                                                  NULL,
+                                                  &error);
+
+                        if (error) {
+                                /* Silently ignore errors */
+                                g_clear_error (&error);
+                                found = FALSE;
+                        } else {
+                                current_file_time = g_file_info_get_attribute_uint64 (info, attrib);
+                                found = (query_time <= current_file_time);
+                        }
+
+                        g_clear_object (&location);
+                }
 
 		if (found) {
 			uri = nautilus_file_get_uri (file);

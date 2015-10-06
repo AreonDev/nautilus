@@ -255,6 +255,7 @@ nautilus_search_engine_tracker_start (NautilusSearchProvider *provider)
 	GList *mimetypes, *l;
 	gint mime_count;
 	gboolean recursive;
+        GDateTime *dt;
 
 	tracker = NAUTILUS_SEARCH_ENGINE_TRACKER (provider);
 
@@ -283,10 +284,11 @@ nautilus_search_engine_tracker_start (NautilusSearchProvider *provider)
         location = nautilus_query_get_location (tracker->details->query);
 	location_uri = location ? g_file_get_uri (location) : NULL;
 	mimetypes = nautilus_query_get_mime_types (tracker->details->query);
+        dt = nautilus_query_get_date (tracker->details->query);
 
 	mime_count = g_list_length (mimetypes);
 
-	sparql = g_string_new ("SELECT DISTINCT nie:url(?urn) fts:rank(?urn) tracker:coalesce(nfo:fileLastModified(?urn), nie:contentLastModified(?urn)) tracker:coalesce(nfo:fileLastAccessed(?urn), nie:contentAccessed(?urn)) "
+	sparql = g_string_new ("SELECT DISTINCT nie:url(?urn) fts:rank(?urn) tracker:coalesce(nfo:fileLastModified(?urn), nie:contentLastModified(?urn)) AS ?mtime tracker:coalesce(nfo:fileLastAccessed(?urn), nie:contentAccessed(?urn)) AS ?atime \n"
 			       "WHERE {"
 			       "  ?urn a nfo:FileDataObject ;"
 			       "  tracker:available true ; ");
@@ -305,6 +307,24 @@ nautilus_search_engine_tracker_start (NautilusSearchProvider *provider)
 
 	g_string_append_printf (sparql, "fn:contains(fn:lower-case(nfo:fileName(?urn)), '%s')", search_text);
 
+        if (dt != NULL) {
+                NautilusQuerySearchType type;
+                gchar *dt_format;
+
+                type = nautilus_query_get_search_type (tracker->details->query);
+                dt_format = g_date_time_format (dt, "%Y-%m-%dT%H:%M:%S");
+
+                g_string_append (sparql, " && ");
+
+                if (type == NAUTILUS_QUERY_SEARCH_TYPE_LAST_ACCESS) {
+                        g_string_append_printf (sparql, "?atime <= \"%s\"^^xsd:dateTime", dt_format);
+                } else {
+                        g_string_append_printf (sparql, "?mtime <= \"%s\"^^xsd:dateTime", dt_format);
+                }
+
+                g_free (dt_format);
+        }
+
 	if (mime_count > 0) {
 		g_string_append (sparql, " && (");
 
@@ -316,7 +336,7 @@ nautilus_search_engine_tracker_start (NautilusSearchProvider *provider)
 			g_string_append_printf (sparql, "fn:contains(?mime, '%s')",
 						(gchar *) l->data);
 		}
-		g_string_append (sparql, ")");
+		g_string_append (sparql, ")\n");
 	}
 
 	g_string_append (sparql, ")} ORDER BY DESC (fts:rank(?urn))");

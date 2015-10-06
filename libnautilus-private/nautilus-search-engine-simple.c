@@ -195,6 +195,7 @@ send_batch (SearchThreadData *thread_data)
 	G_FILE_ATTRIBUTE_STANDARD_IS_HIDDEN "," \
 	G_FILE_ATTRIBUTE_STANDARD_TYPE "," \
 	G_FILE_ATTRIBUTE_TIME_MODIFIED "," \
+        G_FILE_ATTRIBUTE_TIME_ACCESS "," \
 	G_FILE_ATTRIBUTE_ID_FILE
 
 static void
@@ -250,6 +251,27 @@ visit_directory (GFile *dir, SearchThreadData *data)
 				}
 			}
 		}
+
+                if (found && nautilus_query_get_date (data->query) != NULL) {
+                        NautilusQuerySearchType type;
+                        GDateTime *date;
+                        guint64 current_file_time, query_time;
+                        const gchar *attrib;
+
+                        type = nautilus_query_get_search_type (data->query);
+
+                        if (type == NAUTILUS_QUERY_SEARCH_TYPE_LAST_ACCESS) {
+                                attrib = G_FILE_ATTRIBUTE_TIME_ACCESS;
+                        } else {
+                                attrib = G_FILE_ATTRIBUTE_TIME_MODIFIED;
+                        }
+
+                        date = nautilus_query_get_date (data->query);
+                        query_time = g_date_time_to_unix (date);
+                        current_file_time = g_file_info_get_attribute_uint64 (info, attrib);
+
+                        found = (query_time <= current_file_time);
+                }
 		
 		if (found) {
 			NautilusSearchHit *hit;
