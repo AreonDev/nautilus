@@ -635,6 +635,18 @@ nautilus_window_slot_get_property (GObject *object,
 }
 
 static void
+recursive_search_setting_changed (NautilusWindowSlot *slot)
+{
+        NautilusView *view;
+
+        view = nautilus_window_slot_get_current_view (slot);
+
+        if (nautilus_view_is_searching (view)) {
+                nautilus_window_slot_force_reload (slot);
+        }
+}
+
+static void
 nautilus_window_slot_constructed (GObject *object)
 {
 	NautilusWindowSlot *slot = NAUTILUS_WINDOW_SLOT (object);
@@ -654,6 +666,12 @@ nautilus_window_slot_constructed (GObject *object)
 	slot->details->query_editor = NAUTILUS_QUERY_EDITOR (nautilus_query_editor_new ());
         gtk_widget_show (GTK_WIDGET (slot->details->query_editor));
         nautilus_window_slot_add_extra_location_widget (slot, GTK_WIDGET (slot->details->query_editor));
+
+        /* Reload searches whenever the recursive-search setting changes */
+        g_signal_connect_swapped (nautilus_preferences,
+                                  "changed::enable-recursive-search",
+                                  G_CALLBACK (recursive_search_setting_changed),
+                                  object);
 
 	slot->details->title = g_strdup (_("Loading…"));
 }
