@@ -3,6 +3,7 @@
   <gresource prefix="/org/gnome/nautilus">
     <file compressed="true">nautilus-bookmarks-window.ui</file>
     <file compressed="true">nautilus-file-management-properties.ui</file>
+    <file compressed="true">nautilus-search-popover.ui</file>
     <file>nautilus-app-menu.ui</file>
     <file>nautilus-pathbar-context-menu.xml</file>
     <file>nautilus-toolbar-ui.xml</file>
