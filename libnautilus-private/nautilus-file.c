@@ -3742,6 +3742,33 @@ nautilus_file_peek_display_name (NautilusFile *file)
 			g_free (escaped_name);
 		}
 	}
+	
+	GSettings* settings = g_settings_new("org.gnome.nautilus.preferences");
+	GVariant* hide_ext = g_settings_get_value(settings, "hide-file-extension");
+
+	if(g_variant_get_boolean(hide_ext))
+	{
+        	//Parse display_name
+		int i = strlen(file->details->display_name);
+
+		for(i = strlen(file->details->display_name); i > -1; i--)
+		{
+			if((i >= 0) && (file->details->display_name[i] == '.'))
+				break;
+		}
+
+		if(i >= 0)
+		{	
+			//Now correct display name...
+			char* new_name = g_strndup(file->details->display_name, i);
+		
+			nautilus_file_set_display_name(file, new_name, NULL, FALSE);
+
+			g_free(new_name);
+		}
+	}		
+
+	g_variant_unref(hide_ext);		
 
 	return file->details->display_name ?
 		eel_ref_str_peek (file->details->display_name) : "";

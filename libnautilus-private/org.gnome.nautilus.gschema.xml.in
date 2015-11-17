@@ -65,6 +65,11 @@
       <_summary>Where to position newly open tabs in browser windows.</_summary>
       <_description>If set to "after-current-tab", then new tabs are inserted after the current tab. If set to "end", then new tabs are appended to the end of the tab list.</_description>
     </key>
+    <key name="hide-file-extension" type="b">
+        <default>false</default>
+        <summary>Hide file extension</summary>
+        <description>If set to true, then Nautilus will hide file extension</description>
+    </key>
     <key name="always-use-location-entry" type="b">
       <default>false</default>
       <_summary>Always use the location entry, instead of the pathbar</_summary>
