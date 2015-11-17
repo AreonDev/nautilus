@@ -1960,34 +1960,99 @@ nautilus_window_initialize_actions (NautilusWindow *window)
 					 window);
 
 	app = g_application_get_default ();
-	nautilus_application_add_accelerator (app, "win.back", "<alt>Left");
-	nautilus_application_add_accelerator (app, "win.forward", "<alt>Right");
-	nautilus_application_add_accelerator (app, "win.enter-location", "<control>l");
-	nautilus_application_add_accelerator (app, "win.new-tab", "<control>t");
-	nautilus_application_add_accelerator (app, "win.close-current-view", "<control>w");
+	
+	GSettings* settings = g_settings_new("org.gnome.nautilus.key-binding");
+	GVariant* enable_key_binding_var = g_settings_get_value(settings, "use-key-binding");
+	gboolean enable_key_binding = g_variant_get_boolean(enable_key_binding_var);
+	g_variant_unref(enable_key_binding_var);
 
-        /* Special case reload, since users are used to use two shortcuts instead of one */
-	gtk_application_set_accels_for_action (GTK_APPLICATION (app), "win.reload", reload_accels);
+	if(!enable_key_binding)
+	{
+		nautilus_application_add_accelerator (app, "win.back", "<alt>Left");
+		nautilus_application_add_accelerator (app, "win.forward", "<alt>Right");
+		nautilus_application_add_accelerator (app, "win.enter-location", "<control>l");
+		nautilus_application_add_accelerator (app, "win.new-tab", "<control>t");
+		nautilus_application_add_accelerator (app, "win.close-current-view", "<control>w");
 
-	nautilus_application_add_accelerator (app, "win.undo", "<control>z");
-	nautilus_application_add_accelerator (app, "win.redo", "<shift><control>z");
-	/* Only accesible by shorcuts */
-	nautilus_application_add_accelerator (app, "win.bookmark-current-location", "<control>d");
-	nautilus_application_add_accelerator (app, "win.up", "<alt>Up");
-	nautilus_application_add_accelerator (app, "win.go-home", "<alt>Home");
-	nautilus_application_add_accelerator (app, "win.tab-previous", "<control>Page_Up");
-	nautilus_application_add_accelerator (app, "win.tab-next", "<control>Page_Down");
-	nautilus_application_add_accelerator (app, "win.tab-move-left", "<shift><control>Page_Up");
-	nautilus_application_add_accelerator (app, "win.tab-move-right", "<shift><control>Page_Down");
-	nautilus_application_add_accelerator (app, "win.prompt-root-location", "slash");
-	nautilus_application_add_accelerator (app, "win.prompt-home-location", "asciitilde");
-	nautilus_application_add_accelerator (app, "win.action-menu", "F10");
+        	/* Special case reload, since users are used to use two shortcuts instead of one */
+		gtk_application_set_accels_for_action (GTK_APPLICATION (app), "win.reload", reload_accels);
 
-	/* Alt+N for the first 9 tabs */
-	for (i = 0; i < 9; ++i) {
-		g_snprintf (detailed_action, sizeof (detailed_action), "win.go-to-tab(%i)", i);
-		g_snprintf (accel, sizeof (accel), "<alt>%i", i + 1);
-		nautilus_application_add_accelerator (app, detailed_action, accel);
+		nautilus_application_add_accelerator (app, "win.undo", "<control>z");
+		nautilus_application_add_accelerator (app, "win.redo", "<shift><control>z");
+		/* Only accesible by shorcuts */
+		nautilus_application_add_accelerator (app, "win.bookmark-current-location", "<control>d");
+		nautilus_application_add_accelerator (app, "win.up", "<alt>Up");
+		nautilus_application_add_accelerator (app, "win.go-home", "<alt>Home");
+		nautilus_application_add_accelerator (app, "win.tab-previous", "<control>Page_Up");
+		nautilus_application_add_accelerator (app, "win.tab-next", "<control>Page_Down");
+		nautilus_application_add_accelerator (app, "win.tab-move-left", "<shift><control>Page_Up");
+		nautilus_application_add_accelerator (app, "win.tab-move-right", "<shift><control>Page_Down");
+		nautilus_application_add_accelerator (app, "win.prompt-root-location", "slash");
+		nautilus_application_add_accelerator (app, "win.prompt-home-location", "asciitilde");
+		nautilus_application_add_accelerator (app, "win.action-menu", "F10");
+
+		/* Alt+N for the first 9 tabs */
+		for (i = 0; i < 9; ++i) {
+			g_snprintf (detailed_action, sizeof (detailed_action), "win.go-to-tab(%i)", i);
+			g_snprintf (accel, sizeof (accel), "<alt>%i", i + 1);
+			nautilus_application_add_accelerator (app, detailed_action, accel);
+		}
+	}else
+	{
+		//Here load all keybindings
+                GVariant* win_back_var    = g_settings_get_value(settings, "key-binding-win-back");
+		GVariant* win_forward_var = g_settings_get_value(settings, "key-binding-win-forward");
+                GVariant* win_enter_location_var = g_settings_get_value(settings, "key-binding-win-enter-location");
+		GVariant* win_new_tab_var = g_settings_get_value(settings, "key-binding-win-new-tab");
+		GVariant* win_close_current_view_var = g_settings_get_value(settings, "key-binding-win-close-current-view");
+                GVariant* win_reload_var = g_settings_get_value(settings, "key-binding-win-reload");
+                GVariant* win_undo_var = g_settings_get_value(settings, "key-binding-win-undo");
+		GVariant* win_redo_var = g_settings_get_value(settings, "key-binding-win-redo");
+                GVariant* win_bookmark_current_location_var = g_settings_get_value(settings, 
+			"key-binding-win-bookmark-current-location");
+		GVariant* win_up_var = g_settings_get_value(settings, "key-binding-win-up");
+		GVariant* win_go_home_var = g_settings_get_value(settings, "key-binding-win-go-home");
+		GVariant* win_tab_previous_var = g_settings_get_value(settings, "key-binding-win-tab-previous");
+		GVariant* win_tab_next_var = g_settings_get_value(settings, "key-binding-win-tab-next");
+		GVariant* win_tab_move_left_var = g_settings_get_value(settings, "key-binding-win-tab-move-left");
+		GVariant* win_tab_move_right_var = g_settings_get_value(settings, "key-binding-win-tab-move-right");
+		GVariant* win_prompt_root_location_var = g_settings_get_value(settings, 
+			"key-binding-win-prompt-root-location");
+		GVariant* win_prompt_home_location_var = g_settings_get_value(settings,
+			"key-binding-win-prompt-home-location");
+		GVariant* win_action_menu_var = g_settings_get_value(settings, "key-binding-win-action-menu");	
+
+		//Her set all properties
+		nautilus_application_add_accelerator (app, "win.back", g_variant_get_string(win_back_var, NULL));
+		nautilus_application_add_accelerator (app, "win.forward", g_variant_get_string(win_forward_var, NULL));
+		nautilus_application_add_accelerator (app, "win.enter-location", g_variant_get_string(win_enter_location_var, NULL));
+		nautilus_application_add_accelerator (app, "win.new-tab", g_variant_get_string(win_new_tab_var, NULL));
+		nautilus_application_add_accelerator (app, "win.close-current-view", 
+			g_variant_get_string(win_close_current_view_var, NULL));
+
+		nautilus_application_add_accelerator (app, "win.reload", g_variant_get_string(win_reload_var, NULL));
+
+		nautilus_application_add_accelerator (app, "win.undo", g_variant_get_string(win_undo_var, NULL));
+		nautilus_application_add_accelerator (app, "win.redo", g_variant_get_string(win_redo_var, NULL));
+		nautilus_application_add_accelerator (app, "win.bookmark-current-location",
+			g_variant_get_string(win_bookmark_current_location_var, NULL));
+		nautilus_application_add_accelerator (app, "win.up", g_variant_get_string(win_up_var, NULL));
+		nautilus_application_add_accelerator (app, "win.go-home", g_variant_get_string(win_go_home_var, NULL));
+		nautilus_application_add_accelerator (app, "win.tab-previous",
+			g_variant_get_string(win_tab_previous_var, NULL));
+		nautilus_application_add_accelerator (app, "win.tab-next",
+			g_variant_get_string(win_tab_next_var, NULL));
+		nautilus_application_add_accelerator (app, "win.tab-move-left",
+			g_variant_get_string(win_tab_move_left_var, NULL));
+		nautilus_application_add_accelerator (app, "win.tab-move-right",
+			g_variant_get_string(win_tab_move_right_var, NULL));
+		nautilus_application_add_accelerator (app, "win.prompt-root-location",
+			g_variant_get_string(win_prompt_root_location_var, NULL));
+		nautilus_application_add_accelerator (app, "win.prompt-home-location", 
+			g_variant_get_string(win_prompt_home_location_var, NULL));
+		nautilus_application_add_accelerator (app, "win.action-menu", g_variant_get_string(win_action_menu_var, NULL));
+
+
 	}
 
 	action = g_action_map_lookup_action (G_ACTION_MAP (app), "show-hide-sidebar");

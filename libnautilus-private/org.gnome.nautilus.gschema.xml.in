@@ -346,4 +346,65 @@
       <_description>If set to true, newly opened windows will have the side pane visible.</_description>
     </key>
   </schema>
+  <schema id="org.gnome.nautilus.key-binding" path="/org/gnome/nautilus/key-binding/" gettext-domain="nautilus">
+    <key name="use-key-binding" type="b">
+      <default>true</default>
+      <summary>Enables Key-Binding</summary>
+      <description>If set to true, then Nautilus will use Key-Binding. Restart required...</description>
+    </key>
+    <key name="key-binding-win-back" type="s">
+      <default>'&lt;alt&gt;Left'</default>
+    </key>
+    <key name="key-binding-win-forward" type="s">
+      <default>'&lt;alt&gt;Right'</default>
+    </key>
+    <key name="key-binding-win-enter-location" type="s">
+      <default>'&lt;control&gt;l'</default>
+    </key>
+    <key name="key-binding-win-new-tab" type="s">
+      <default>'&lt;control&gt;t'</default>
+    </key>
+    <key name="key-binding-win-close-current-view" type="s">
+      <default>'&lt;control&gt;w'</default>
+    </key>
+    <key name="key-binding-win-reload" type="s">
+      <default>'F5'</default>
+    </key>
+    <key name="key-binding-win-undo" type="s">
+      <default>'&lt;control&gt;z'</default>
+    </key>
+    <key name="key-binding-win-redo" type="s">
+      <default>'&lt;shift&gt;&lt;control&gt;z'</default>
+    </key>
+    <key name="key-binding-win-bookmark-current-location" type="s">
+      <default>'&lt;control&gt;d'</default>
+    </key>
+    <key name="key-binding-win-up" type="s">
+      <default>'&lt;alt&gt;Up'</default>
+    </key>
+    <key name="key-binding-win-go-home" type="s">
+      <default>'&lt;alt&gt;Home'</default>
+    </key>
+    <key name="key-binding-win-tab-previous" type="s">
+      <default>'&lt;control&gt;Page_Up'</default>
+    </key>
+    <key name="key-binding-win-tab-next" type="s">
+      <default>'&lt;control&gt;Page_Down'</default>
+    </key>
+    <key name="key-binding-win-tab-move-left" type="s">
+      <default>'&lt;shift&gt;&lt;control&gt;Page_Up'</default>
+    </key>
+    <key name="key-binding-win-tab-move-right" type="s">
+      <default>'&lt;shift&gt;&lt;control&gt;Page_Down'</default>
+    </key>
+    <key name="key-binding-win-prompt-root-location" type="s">
+      <default>'slash'</default>
+    </key>
+    <key name="key-binding-win-prompt-home-location" type="s">
+      <default>'asciitilde'</default>
+    </key>
+    <key name="key-binding-win-action-menu" type="s">
+      <default>'F10'</default>
+    </key>
+  </schema>
 </schemalist>
