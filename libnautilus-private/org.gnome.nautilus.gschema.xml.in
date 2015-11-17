@@ -176,6 +176,11 @@
       <_summary>Whether to show hidden files</_summary>
       <_description>This key is deprecated and ignored. The "show-hidden" key from "org.gtk.Settings.FileChooser" is now used instead.</_description>
     </key>
+    <key type="b" name="always-show-backup-files">
+      <default>false</default>
+      <summary>Whether to show backup files</summary>
+      <description>Backup files will be visible even if hidden files are not.</description>
+    </key>
     <key name="list-view-on-search" type="b">
       <default>true</default>
       <_summary>Whether to switch to the list view on search</_summary>

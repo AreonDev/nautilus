@@ -35,6 +35,7 @@ G_BEGIN_DECLS
 
 /* Display  */
 #define NAUTILUS_PREFERENCES_SHOW_HIDDEN_FILES			"show-hidden"
+#define NAUTILUS_PREFERENCES_ALWAYS_SHOW_BACKUP_FILES		"always-show-backup-files"
 
 /* Mouse */
 #define NAUTILUS_PREFERENCES_MOUSE_USE_EXTRA_BUTTONS		"mouse-use-extra-buttons"

@@ -2208,7 +2208,12 @@ update_info_internal (NautilusFile *file,
 	}
 	file->details->is_symlink = is_symlink;
 
-	is_hidden = g_file_info_get_is_hidden (info) || g_file_info_get_is_backup (info);
+        if (g_settings_get_boolean (nautilus_preferences,
+                                    NAUTILUS_PREFERENCES_ALWAYS_SHOW_BACKUP_FILES)) {
+		is_hidden = g_file_info_get_is_hidden (info);
+	} else {
+		is_hidden = g_file_info_get_is_hidden (info) || g_file_info_get_is_backup (info);
+	}
 	if (file->details->is_hidden != is_hidden) {
 		changed = TRUE;
 	}
