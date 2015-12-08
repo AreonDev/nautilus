@@ -47,7 +47,8 @@
 typedef enum {
 	NAUTILUS_NAVIGATION_DIRECTION_NONE,
 	NAUTILUS_NAVIGATION_DIRECTION_BACK,
-	NAUTILUS_NAVIGATION_DIRECTION_FORWARD
+	NAUTILUS_NAVIGATION_DIRECTION_FORWARD,
+        NAUTILUS_NAVIGATION_DIRECTION_UP
 } NautilusNavigationDirection;
 
 struct _NautilusToolbarPrivate {
@@ -78,6 +79,7 @@ struct _NautilusToolbarPrivate {
 
 	GtkWidget *forward_button;
 	GtkWidget *back_button;
+        GtkWidget *up_button;
 
         NautilusProgressInfoManager *progress_manager;
 
@@ -144,7 +146,7 @@ activate_forward_menu_item_callback (GtkMenuItem *menu_item, NautilusWindow *win
 static void
 fill_menu (NautilusWindow *window,
 	   GtkWidget *menu,
-	   gboolean back)
+	   NautilusNavigationDirection direction)
 {
 	NautilusWindowSlot *slot;
 	GtkWidget *menu_item;
@@ -152,8 +154,21 @@ fill_menu (NautilusWindow *window,
 	GList *list;
 
 	slot = nautilus_window_get_active_slot (window);
-	list = back ? nautilus_window_slot_get_back_history (slot) :
-		nautilus_window_slot_get_forward_history (slot);
+
+  	switch (direction) {
+	case NAUTILUS_NAVIGATION_DIRECTION_FORWARD:
+		list = nautilus_window_slot_get_forward_history (slot);
+		break;
+	case NAUTILUS_NAVIGATION_DIRECTION_BACK:
+		list = nautilus_window_slot_get_back_history (slot);
+		break;
+        case NAUTILUS_NAVIGATION_DIRECTION_UP:
+                list = nautilus_window_slot_get_back_history (slot);
+                break;
+	default:
+		g_assert_not_reached ();
+		break;
+	}
 
 	index = 0;
 	while (list != NULL) {
@@ -244,17 +259,7 @@ show_menu (NautilusToolbar *self,
 	direction = GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (widget),
 							 "nav-direction"));
 
-	switch (direction) {
-	case NAUTILUS_NAVIGATION_DIRECTION_FORWARD:
-		fill_menu (window, menu, FALSE);
-		break;
-	case NAUTILUS_NAVIGATION_DIRECTION_BACK:
-		fill_menu (window, menu, TRUE);
-		break;
-	default:
-		g_assert_not_reached ();
-		break;
-	}
+        fill_menu (window, menu, direction);
 
         gtk_menu_popup (GTK_MENU (menu), NULL, NULL,
 			(GtkMenuPositionFunc) menu_position_func, widget,
@@ -784,6 +789,8 @@ nautilus_toolbar_init (NautilusToolbar *self)
 			   GUINT_TO_POINTER (NAUTILUS_NAVIGATION_DIRECTION_BACK));
 	g_object_set_data (G_OBJECT (self->priv->forward_button), "nav-direction",
 			   GUINT_TO_POINTER (NAUTILUS_NAVIGATION_DIRECTION_FORWARD));
+        g_object_set_data (G_OBJECT (self->priv->up_button), "nav-up",
+                           GUINT_TO_POINTER (NAUTILUS_NAVIGATION_DIRECTION_UP));
 	g_signal_connect (self->priv->back_button, "button-press-event",
 			  G_CALLBACK (navigation_button_press_cb), self);
 	g_signal_connect (self->priv->back_button, "button-release-event",
@@ -791,6 +798,10 @@ nautilus_toolbar_init (NautilusToolbar *self)
 	g_signal_connect (self->priv->forward_button, "button-press-event",
 			  G_CALLBACK (navigation_button_press_cb), self);
 	g_signal_connect (self->priv->forward_button, "button-release-event",
+			  G_CALLBACK (navigation_button_release_cb), self);
+	g_signal_connect (self->priv->up_button, "button-press-event",
+			  G_CALLBACK (navigation_button_press_cb), self);
+	g_signal_connect (self->priv->up_button, "button-release-event",
 			  G_CALLBACK (navigation_button_release_cb), self);
 
 	gtk_widget_show_all (GTK_WIDGET (self));
@@ -897,6 +908,7 @@ nautilus_toolbar_class_init (NautilusToolbarClass *klass)
 	gtk_widget_class_bind_template_child_private (widget_class, NautilusToolbar, location_entry_container);
 	gtk_widget_class_bind_template_child_private (widget_class, NautilusToolbar, back_button);
 	gtk_widget_class_bind_template_child_private (widget_class, NautilusToolbar, forward_button);
+        gtk_widget_class_bind_template_child_private (widget_class, NautilusToolbar, up_button);
 
         gtk_widget_class_bind_template_callback (widget_class, on_operations_icon_draw);
         gtk_widget_class_bind_template_callback (widget_class, on_operations_button_toggled);
