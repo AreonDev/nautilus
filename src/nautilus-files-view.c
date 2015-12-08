@@ -5893,7 +5893,9 @@ const GActionEntry view_entries[] = {
          * is set and when the common use cases for delete permanently which uses
          * Delete as a shortcut are not needed. For instance this will be only
          * present when the setting is true and when it can trash files */
+#ifdef NAUTILUS_DELETE_PERMANENTLY_FLAG
         { "permanent-delete-permanently-menu-item", action_delete },
+#endif
         { "remove-from-recent", action_remove_from_recent },
         { "restore-from-trash", action_restore_from_trash},
         { "paste-into", action_paste_files_into },
