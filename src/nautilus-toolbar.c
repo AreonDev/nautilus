@@ -78,6 +78,7 @@ struct _NautilusToolbarPrivate {
 
 	GtkWidget *forward_button;
 	GtkWidget *back_button;
+	GtkWidget *up_button;
 
         NautilusProgressInfoManager *progress_manager;
 
@@ -112,6 +113,11 @@ toolbar_update_appearance (NautilusToolbar *self)
 				show_location_entry);
 	gtk_widget_set_visible (self->priv->path_bar,
 				!show_location_entry);
+#ifdef NAUTILUS_SHOW_UP_BUTTON
+        gtk_widget_set_visible (self->priv->up_button, TRUE);
+#else
+        gtk_widget_set_visible (self->priv->up_button, FALSE);
+#endif
 }
 
 static void
@@ -898,6 +904,7 @@ nautilus_toolbar_class_init (NautilusToolbarClass *klass)
 	gtk_widget_class_bind_template_child_private (widget_class, NautilusToolbar, location_entry_container);
 	gtk_widget_class_bind_template_child_private (widget_class, NautilusToolbar, back_button);
 	gtk_widget_class_bind_template_child_private (widget_class, NautilusToolbar, forward_button);
+	gtk_widget_class_bind_template_child_private (widget_class, NautilusToolbar, up_button);
 
         gtk_widget_class_bind_template_callback (widget_class, on_operations_icon_draw);
         gtk_widget_class_bind_template_callback (widget_class, on_operations_button_toggled);
