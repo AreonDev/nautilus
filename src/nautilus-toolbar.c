@@ -48,7 +48,9 @@ typedef enum {
 	NAUTILUS_NAVIGATION_DIRECTION_NONE,
 	NAUTILUS_NAVIGATION_DIRECTION_BACK,
 	NAUTILUS_NAVIGATION_DIRECTION_FORWARD,
+#ifdef NAUTILUS_SHOW_UP_BUTTON
         NAUTILUS_NAVIGATION_DIRECTION_UP
+#endif
 } NautilusNavigationDirection;
 
 struct _NautilusToolbarPrivate {
@@ -79,7 +81,9 @@ struct _NautilusToolbarPrivate {
 
 	GtkWidget *forward_button;
 	GtkWidget *back_button;
+#ifdef NAUTILUS_SHOW_UP_BUTTON
         GtkWidget *up_button;
+#endif
 
         NautilusProgressInfoManager *progress_manager;
 
@@ -143,26 +147,36 @@ activate_forward_menu_item_callback (GtkMenuItem *menu_item, NautilusWindow *win
 	activate_back_or_forward_menu_item (menu_item, window, FALSE);
 }
 
+#ifdef NAUTILUS_SHOW_UP_BUTTON
 static void
 activate_up_menu_item_callback (GtkMenuItem    *menu_item,
                                 NautilusWindow *window)
 {
         activate_back_or_forward_menu_item (menu_item, window, FALSE);
 }
+#endif
 
 static void
 fill_menu (NautilusWindow *window,
 	   GtkWidget *menu,
-	   NautilusNavigationDirection direction)
+#ifdef NAUTILUS_SHOW_UP_BUTTON
+	   NautilusNavigationDirection direction
+#else
+           gboolean back
+#endif
+           )
 {
 	NautilusWindowSlot *slot;
 	GtkWidget *menu_item;
+#ifdef NAUTILUS_SHOW_UP_BUTTON
         GCallback callback;
+#endif
 	int index;
 	GList *list;
 
 	slot = nautilus_window_get_active_slot (window);
 
+#ifdef NAUTILUS_SHOW_UP_BUTTON
   	switch (direction) {
 	case NAUTILUS_NAVIGATION_DIRECTION_FORWARD:
 		list = nautilus_window_slot_get_forward_history (slot);
@@ -181,13 +195,24 @@ fill_menu (NautilusWindow *window,
 		break;
 	}
 
+#else
+        list = back ? nautilus_window_slot_get_back_history (slot) :
+                nautilus_window_slot_get_forward_history (slot);
+#endif
+
 	index = 0;
 	while (list != NULL) {
 		menu_item = nautilus_bookmark_menu_item_new (NAUTILUS_BOOKMARK (list->data));
 		g_object_set_data (G_OBJECT (menu_item), "user_data", GINT_TO_POINTER (index));
 		gtk_widget_show (GTK_WIDGET (menu_item));
   		g_signal_connect_object (menu_item, "activate",
+#ifdef NAUTILUS_SHOW_UP_BUTTON
 					 callback,
+#else
+                                         back
+                                         ? G_CALLBACK (activate_back_menu_item_callback)
+                                         : G_CALLBACK (activate_forward_menu_item_callback),
+#endif
 					 window, 0);
 
 		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
@@ -268,7 +293,21 @@ show_menu (NautilusToolbar *self,
 	direction = GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (widget),
 							 "nav-direction"));
 
+#ifdef NAUTILUS_SHOW_UP_BUTTON
         fill_menu (window, menu, direction);
+#else
+        switch (direction) {
+        case NAUTILUS_NAVIGATION_DIRECTION_FORWARD:
+                fill_menu (window, menu, FALSE);
+                break;
+        case NAUTILUS_NAVIGATION_DIRECTION_BACK:
+                fill_menu (window, menu, TRUE);
+                break;
+        default:
+                g_assert_not_reached ();
+                break;
+        }
+#endif
 
         gtk_menu_popup (GTK_MENU (menu), NULL, NULL,
 			(GtkMenuPositionFunc) menu_position_func, widget,
@@ -798,8 +837,10 @@ nautilus_toolbar_init (NautilusToolbar *self)
 			   GUINT_TO_POINTER (NAUTILUS_NAVIGATION_DIRECTION_BACK));
 	g_object_set_data (G_OBJECT (self->priv->forward_button), "nav-direction",
 			   GUINT_TO_POINTER (NAUTILUS_NAVIGATION_DIRECTION_FORWARD));
+#ifdef NAUTILUS_SHOW_UP_BUTTON
         g_object_set_data (G_OBJECT (self->priv->up_button), "nav-up",
                            GUINT_TO_POINTER (NAUTILUS_NAVIGATION_DIRECTION_UP));
+#endif
 	g_signal_connect (self->priv->back_button, "button-press-event",
 			  G_CALLBACK (navigation_button_press_cb), self);
 	g_signal_connect (self->priv->back_button, "button-release-event",
@@ -808,10 +849,12 @@ nautilus_toolbar_init (NautilusToolbar *self)
 			  G_CALLBACK (navigation_button_press_cb), self);
 	g_signal_connect (self->priv->forward_button, "button-release-event",
 			  G_CALLBACK (navigation_button_release_cb), self);
+#ifdef NAUTILUS_SHOW_UP_BUTTON
 	g_signal_connect (self->priv->up_button, "button-press-event",
 			  G_CALLBACK (navigation_button_press_cb), self);
 	g_signal_connect (self->priv->up_button, "button-release-event",
 			  G_CALLBACK (navigation_button_release_cb), self);
+#endif
 
 	gtk_widget_show_all (GTK_WIDGET (self));
 	toolbar_update_appearance (self);
@@ -917,7 +960,9 @@ nautilus_toolbar_class_init (NautilusToolbarClass *klass)
 	gtk_widget_class_bind_template_child_private (widget_class, NautilusToolbar, location_entry_container);
 	gtk_widget_class_bind_template_child_private (widget_class, NautilusToolbar, back_button);
 	gtk_widget_class_bind_template_child_private (widget_class, NautilusToolbar, forward_button);
+#ifdef NAUTILUS_SHOW_UP_BUTTON
         gtk_widget_class_bind_template_child_private (widget_class, NautilusToolbar, up_button);
+#endif
 
         gtk_widget_class_bind_template_callback (widget_class, on_operations_icon_draw);
         gtk_widget_class_bind_template_callback (widget_class, on_operations_button_toggled);
