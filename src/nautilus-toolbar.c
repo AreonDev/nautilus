@@ -144,12 +144,20 @@ activate_forward_menu_item_callback (GtkMenuItem *menu_item, NautilusWindow *win
 }
 
 static void
+activate_up_menu_item_callback (GtkMenuItem    *menu_item,
+                                NautilusWindow *window)
+{
+        activate_back_or_forward_menu_item (menu_item, window, FALSE);
+}
+
+static void
 fill_menu (NautilusWindow *window,
 	   GtkWidget *menu,
 	   NautilusNavigationDirection direction)
 {
 	NautilusWindowSlot *slot;
 	GtkWidget *menu_item;
+        GCallback callback;
 	int index;
 	GList *list;
 
@@ -158,12 +166,15 @@ fill_menu (NautilusWindow *window,
   	switch (direction) {
 	case NAUTILUS_NAVIGATION_DIRECTION_FORWARD:
 		list = nautilus_window_slot_get_forward_history (slot);
+                callback = G_CALLBACK (activate_forward_menu_item_callback);
 		break;
 	case NAUTILUS_NAVIGATION_DIRECTION_BACK:
 		list = nautilus_window_slot_get_back_history (slot);
+                callback = G_CALLBACK (activate_back_menu_item_callback);
 		break;
         case NAUTILUS_NAVIGATION_DIRECTION_UP:
                 list = nautilus_window_slot_get_back_history (slot);
+                callback = G_CALLBACK (activate_up_menu_item_callback);
                 break;
 	default:
 		g_assert_not_reached ();
@@ -176,9 +187,7 @@ fill_menu (NautilusWindow *window,
 		g_object_set_data (G_OBJECT (menu_item), "user_data", GINT_TO_POINTER (index));
 		gtk_widget_show (GTK_WIDGET (menu_item));
   		g_signal_connect_object (menu_item, "activate",
-					 back
-					 ? G_CALLBACK (activate_back_menu_item_callback)
-					 : G_CALLBACK (activate_forward_menu_item_callback),
+					 callback,
 					 window, 0);
 
 		gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
