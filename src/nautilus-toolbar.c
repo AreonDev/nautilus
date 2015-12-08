@@ -25,6 +25,7 @@
 #include <config.h>
 
 #include "nautilus-toolbar.h"
+#include "nautilus-static-config.h"
 
 #include "nautilus-location-entry.h"
 #include "nautilus-pathbar.h"

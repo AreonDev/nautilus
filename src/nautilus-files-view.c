@@ -28,6 +28,7 @@
 #include <config.h>
 
 #include "nautilus-files-view.h"
+#include "nautilus-static-config.h"
 
 #include "nautilus-application.h"
 #include "nautilus-desktop-canvas-view.h"

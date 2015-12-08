@@ -21,6 +21,7 @@
 */
 
 #include <config.h>
+#include "../src/nautilus-static-config.h"
 #include "nautilus-file.h"
 
 #include "nautilus-directory-notify.h"

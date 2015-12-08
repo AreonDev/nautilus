@@ -29,6 +29,7 @@
 #include "nautilus-window.h"
 
 #include <config.h>
+#include "nautilus-static-config.h"
 
 #include "nautilus-application.h"
 #include "nautilus-bookmarks-window.h"
