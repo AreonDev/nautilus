@@ -378,9 +378,10 @@ nautilus_notebook_add_tab (NautilusNotebook *notebook,
 	tab_label = build_tab_label (notebook, slot);
 
 	position = gtk_notebook_insert_page (GTK_NOTEBOOK (notebook),
-					     GTK_WIDGET (slot),
+					     GTK_WIDGET(slot),
 					     tab_label,
 					     position);
+				
 
 	gtk_container_child_set (GTK_CONTAINER (notebook),
 				 GTK_WIDGET (slot),

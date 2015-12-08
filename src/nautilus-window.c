@@ -1961,6 +1961,7 @@ nautilus_window_initialize_actions (NautilusWindow *window)
 
 	app = g_application_get_default ();
 	
+#ifdef NAUTILUS_USE_KEYBINDING
 	GSettings* settings = g_settings_new("org.gnome.nautilus.key-binding");
 	GVariant* enable_key_binding_var = g_settings_get_value(settings, "use-key-binding");
 	gboolean enable_key_binding = g_variant_get_boolean(enable_key_binding_var);
@@ -1968,6 +1969,7 @@ nautilus_window_initialize_actions (NautilusWindow *window)
 
 	if(!enable_key_binding)
 	{
+#endif
 		nautilus_application_add_accelerator (app, "win.back", "<alt>Left");
 		nautilus_application_add_accelerator (app, "win.forward", "<alt>Right");
 		nautilus_application_add_accelerator (app, "win.enter-location", "<control>l");
@@ -1997,6 +1999,7 @@ nautilus_window_initialize_actions (NautilusWindow *window)
 			g_snprintf (accel, sizeof (accel), "<alt>%i", i + 1);
 			nautilus_application_add_accelerator (app, detailed_action, accel);
 		}
+#ifdef NAUTILUS_USE_KEYBINDING
 	}else
 	{
 		//Here load all keybindings
@@ -2054,6 +2057,7 @@ nautilus_window_initialize_actions (NautilusWindow *window)
 
 
 	}
+#endif
 
 	action = g_action_map_lookup_action (G_ACTION_MAP (app), "show-hide-sidebar");
 	state = g_action_get_state (action);

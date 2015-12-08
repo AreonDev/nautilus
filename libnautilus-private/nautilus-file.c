@@ -2208,12 +2208,18 @@ update_info_internal (NautilusFile *file,
 	}
 	file->details->is_symlink = is_symlink;
 
+#ifndef NAUTILUS_ALWAYS_SHOW_BACKUP_FILES
+	is_hidden = g_file_info_get_is_hidden(info) || g_file_info_get_is_backup(info);
+#endif
+
+#ifdef NAUTILUS_ALWAYS_SHOW_BACKUP_FILES
         if (g_settings_get_boolean (nautilus_preferences,
                                     NAUTILUS_PREFERENCES_ALWAYS_SHOW_BACKUP_FILES)) {
 		is_hidden = g_file_info_get_is_hidden (info);
 	} else {
 		is_hidden = g_file_info_get_is_hidden (info) || g_file_info_get_is_backup (info);
 	}
+#endif
 	if (file->details->is_hidden != is_hidden) {
 		changed = TRUE;
 	}
@@ -3748,6 +3754,7 @@ nautilus_file_peek_display_name (NautilusFile *file)
 		}
 	}
 	
+#ifdef NAUTILUS_HIDE_FILE_EXTENSION
 	GSettings* settings = g_settings_new("org.gnome.nautilus.preferences");
 	GVariant* hide_ext = g_settings_get_value(settings, "hide-file-extension");
 
@@ -3773,7 +3780,8 @@ nautilus_file_peek_display_name (NautilusFile *file)
 		}
 	}		
 
-	g_variant_unref(hide_ext);		
+	g_variant_unref(hide_ext);
+#endif		
 
 	return file->details->display_name ?
 		eel_ref_str_peek (file->details->display_name) : "";
