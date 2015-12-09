@@ -6170,7 +6170,7 @@ real_update_actions_state (NautilusFilesView *view)
         gboolean show_start;
         gboolean show_stop;
         gboolean show_detect_media;
-#ifdef NAUTILUS_DELETE_FILES_PERMANENTLY_FLAG
+#ifdef NAUTILUS_DELETE_PERMANENTLY_FLAG
         gboolean settings_show_delete_permanently;
 #endif
         GDriveStartStopType start_stop_type;
@@ -6208,7 +6208,7 @@ real_update_actions_state (NautilusFilesView *view)
                                 can_paste_into_file (NAUTILUS_FILE (selection->data)));
         show_properties = !NAUTILUS_IS_DESKTOP_CANVAS_VIEW (view) || selection_count > 0;
 
-#ifdef NAUTILUS_DELETE_FILES_PERMANENTLY_FLAG
+#ifdef NAUTILUS_DELETE_PERMANENTLY_FLAG
          settings_show_delete_permanently = g_settings_get_boolean (nautilus_preferences,
                                                                 NAUTILUS_PREFERENCES_SHOW_DELETE_PERMANENTLY);
 #endif
@@ -6321,7 +6321,7 @@ real_update_actions_state (NautilusFilesView *view)
                                      can_delete_files && !can_trash_files &&
                                      !selection_all_in_trash && !selection_contains_recent);
 
-#ifdef NAUTILUS_DELETE_FILES_PERMANENTLY_FLAG
+#ifdef NAUTILUS_DELETE_PERMANENTLY_FLAG
         action = g_action_map_lookup_action (G_ACTION_MAP (view_action_group),
                                              "permanent-delete-permanently-menu-item");
         g_simple_action_set_enabled (G_SIMPLE_ACTION (action),
@@ -8160,7 +8160,7 @@ nautilus_files_view_init (NautilusFilesView *view)
          * the menu item is available, since we never make both the trash and delete-permanently-menu-item
          * actions active */
         nautilus_application_add_accelerator (app, "view.delete-permanently-menu-item", "Delete");
-#ifdef NAUTILUS_DELETE_FILES_PERMANENTLY_FLAG
+#ifdef NAUTILUS_DELETE_PERMANENTLY_FLAG
         nautilus_application_add_accelerator (app, "view.permanent-delete-permanently-menu-item", "<shift>Delete");
 #endif
         nautilus_application_add_accelerator (app, "view.properties", "<control>i");

@@ -33,7 +33,7 @@
 /* This flag controls whether the "Delete Permanently" menu entry in an items
  * context menu should be viewed permanently
  */
-//#define NAUTILUS_DELETE_FILES_PERMANENTLY_FLAG
+//#define NAUTILUS_DELETE_PERMANENTLY_FLAG
 
 /* This flag controls whether backup files should be viewed even if hidden files
  * are not visible.
