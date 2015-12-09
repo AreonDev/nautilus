@@ -48,5 +48,8 @@
  */
 //#define NAUTILUS_USE_KEYBINDING
 
+// This flag controls whether "Open With Other Application" menu entry is hidden or not 
+//#define NAUTILUS_DISABLE_OPEN_WITH_OTHER_APPLICATION
+
 #endif /* NAUTILUS_STATIC_CONFIG_H */
 
