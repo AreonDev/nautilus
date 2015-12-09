@@ -5873,7 +5873,9 @@ const GActionEntry view_entries[] = {
         { "open-scripts-folder", action_open_scripts_folder },
         { "open-item-location", action_open_item_location },
         { "open-with-default-application", action_open_with_default_application },
+#ifndef NAUTILUS_DISABLE_OPEN_WITH_OTHER_APPLICATION
         { "open-with-other-application", action_open_with_other_application },
+#endif
         { "open-item-new-window", action_open_item_new_window },
         { "open-item-new-tab", action_open_item_new_tab },
         { "cut", action_cut},
@@ -6280,6 +6282,7 @@ real_update_actions_state (NautilusFilesView *view)
                                              "open-with-default-application");
         g_simple_action_set_enabled (G_SIMPLE_ACTION (action), selection_count != 0);
 
+#ifndef NAUTILUS_DISABLE_OPEN_WITH_OTHER_APPLICATION
         /* Allow to select a different application to open the item */
         action = g_action_map_lookup_action (G_ACTION_MAP (view_action_group),
                                              "open-with-other-application");
@@ -6287,6 +6290,7 @@ real_update_actions_state (NautilusFilesView *view)
                                      app != NULL ||
                                      (selection_count > 0 &&
                                       nautilus_file_is_directory (NAUTILUS_FILE (selection->data))));
+#endif
 
         action = g_action_map_lookup_action (G_ACTION_MAP (view_action_group),
                                              "open-item-new-tab");
